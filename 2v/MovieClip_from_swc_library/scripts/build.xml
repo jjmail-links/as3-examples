@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Build File" basedir="." default="main">
+
+	<property file="./local.properties" />
+	<fail unless="FLEX_HOME">
+		Error!
+		Please define variable ${FLEX_HOME} in local.properties file.
+		local.properties file must be placed in the same dir where placed build.xml file
+		For example:
+		FLEX_HOME = C:\\flex_sdk_3.5
+	</fail>
+	<property file="./build.properties" />
+
+	<taskdef resource="flexTasks.tasks" classpath="${FlexTasksJar.file}" />
+
+	<property name="default_background_color" value="0xFFFFFF" />
+	<property name="default_width" value="800" />
+	<property name="default_height" value="600" />
+	<property name="debug.boolean" value="false" />
+	<property name="project.dir" location="${basedir}/../" />
+	<property name="src.dir" location="${project.dir}/src/" />
+	<property name="lib.dir" location="${project.dir}/lib/" />
+	<property name="assets.dir" location="${project.dir}/assets/" />
+	<property name="bin.dir" location="${project.dir}/bin/" />
+	<property name="main.application" location="${src.dir}/example/Main.as" />
+	<property name="output.swf.name" value="main" />
+	<property name="main.application.out" location="${bin.dir}/${output.swf.name}.swf" />
+
+	<target name="all" depends="clean,init,compile,run" description="description" />
+	<target name="main" depends="clean,init,compile" description="description" />
+	<target name="run" depends="run.flashplayer" description="description" />
+
+	<target name="run.browser">
+		<fail unless="BROWSER">
+				Error!
+				Please define variable ${BROWSER} in local.properties file.
+				local.properties file must be placed in the same dir where placed build.xml file
+		</fail>
+		<exec executable="${BROWSER}">
+			<arg value="${main.application.out}" />
+		</exec>
+	</target>
+
+	<target name="run.flashplayer">
+		<fail unless="FLASH_PLAYER">
+				Error!
+				Please define variable ${FLASH_PLAYER} in local.properties file.
+				local.properties file must be placed in the same dir where placed build.xml file
+		</fail>
+		<exec executable="${FLASH_PLAYER}">
+			<arg value="${main.application.out}" />
+		</exec>
+	</target>
+
+	<target name="compile" depends="clean,init">
+		<mxmlc 
+			file="${main.application}"
+			output="${main.application.out}" 
+			debug="${debug.boolean}"
+			incremental="false"
+			actionscript-file-encoding="UTF-8" 
+			keep-generated-actionscript="false" 
+			default-background-color="${default_background_color}"
+			target-player="9"
+			use-network="false"
+			>
+			
+			<load-config filename="${FLEX_HOME}/frameworks/flex-config.xml" />
+			<metadata>
+				<creator>Example Creator Name</creator>
+				<publisher>Example Publisher Name</publisher>
+				<language>EN</language>
+			</metadata>
+			<compiler.source-path path-element="${src.dir}" />
+			<default-size width="${default_width}" height="${default_height}" />
+			<compiler.library-path dir="${lib.dir}" append="true">
+							<include name="*.swc"/>
+			</compiler.library-path>
+		</mxmlc>
+	</target>
+
+	<target name="clean">
+		<delete dir="${bin.dir}" failOnError="false" includeEmptyDirs="true" />
+	</target>
+
+	<target name="init" depends="clean">
+		<mkdir dir="${bin.dir}" />
+	</target>
+
+</project>
